@@ -57,10 +57,10 @@
                         @else
                       
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Kategori</a>
+                                <a class="nav-link" href="{{route('kategori.index')}}">Kategori</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Produk</a>
+                                <a class="nav-link" href="{{route('produk.index')}}">Produk</a>
                             </li>
                             
                             <li class="nav-item dropdown">

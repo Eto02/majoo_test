@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $Modified_By
  * @property string $Modified_Date
  * @property string $updated_at
- * @property MstrKategori $mstrKategori
+ * @property ProdukKategori[] $produkKategoris
  */
 class Produk extends Model
 {
@@ -40,10 +40,10 @@ class Produk extends Model
     protected $fillable = ['Id_Kategori', 'Nama_Produk', 'Harga_Produk', 'Deskripsi_Produk', 'Foto_Produk', 'Created_By', 'Created_Date', 'Modified_By', 'Modified_Date', 'updated_at'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function mstrKategori()
+    public function produkKategoris()
     {
-        return $this->belongsTo('App\MstrKategori', 'Id_Kategori', 'Id_Kategori');
+        return $this->hasMany('App\ProdukKategori', 'Id_Produk', 'Id_Produk');
     }
 }

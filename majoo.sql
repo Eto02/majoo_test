@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : Localku
+ Source Server         : LokalLaptop
  Source Server Type    : MySQL
- Source Server Version : 100417
- Source Host           : 127.0.0.1:3306
+ Source Server Version : 100419
+ Source Host           : localhost:3306
  Source Schema         : majoo
 
  Target Server Type    : MySQL
- Target Server Version : 100417
+ Target Server Version : 100419
  File Encoding         : 65001
 
- Date: 26/11/2021 15:25:07
+ Date: 26/11/2021 23:54:39
 */
 
 SET NAMES utf8mb4;
@@ -22,9 +22,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `migrations`;
 CREATE TABLE `migrations`  (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int NOT NULL,
+  `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
@@ -41,7 +41,7 @@ INSERT INTO `migrations` VALUES (4, '2019_12_14_000001_create_personal_access_to
 -- ----------------------------
 DROP TABLE IF EXISTS `mstr_kategori`;
 CREATE TABLE `mstr_kategori`  (
-  `Id_Kategori` int NOT NULL AUTO_INCREMENT,
+  `Id_Kategori` int(11) NOT NULL AUTO_INCREMENT,
   `Nama_Kategori` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `Kode_Kategori` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `Created_By` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
@@ -64,10 +64,10 @@ INSERT INTO `mstr_kategori` VALUES (5, 'Snack', 'SNK', NULL, NULL, NULL, NULL, N
 -- ----------------------------
 DROP TABLE IF EXISTS `mstr_produk`;
 CREATE TABLE `mstr_produk`  (
-  `Id_Produk` int NOT NULL AUTO_INCREMENT,
-  `Id_Kategori` int NULL DEFAULT NULL,
+  `Id_Produk` int(11) NOT NULL AUTO_INCREMENT,
+  `Id_Kategori` int(11) NULL DEFAULT NULL,
   `Nama_Produk` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  `Harga_Produk` int NULL DEFAULT NULL,
+  `Harga_Produk` int(11) NULL DEFAULT NULL,
   `Deskripsi_Produk` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `Foto_Produk` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `Created_By` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
@@ -76,22 +76,46 @@ CREATE TABLE `mstr_produk`  (
   `Modified_Date` datetime(0) NULL DEFAULT NULL,
   `updated_at` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`Id_Produk`) USING BTREE,
-  INDEX `Id_Kategori`(`Id_Kategori`) USING BTREE,
-  CONSTRAINT `mstr_produk_ibfk_1` FOREIGN KEY (`Id_Kategori`) REFERENCES `mstr_kategori` (`Id_Kategori`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `Id_Kategori`(`Id_Kategori`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of mstr_produk
 -- ----------------------------
-INSERT INTO `mstr_produk` VALUES (1, NULL, 'SELVIANA', 12, '&lt;strong&gt;sda&lt;/strong&gt;&lt;strong&gt;&lt;/strong&gt;', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
-INSERT INTO `mstr_produk` VALUES (2, NULL, 'SELVIANA', 112, '&lt;strong&gt;asdas&lt;/strong&gt;', 'public/upload/foto/2', NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-26 07:15:49');
+INSERT INTO `mstr_produk` VALUES (1, NULL, 'Paket Adcance', 1000000, '&lt;strong&gt;Paket Advance&lt;/strong&gt;&lt;strong&gt;&lt;/strong&gt;', 'public/upload/foto/1', NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-26 16:29:11');
+INSERT INTO `mstr_produk` VALUES (4, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', 'public/upload/foto/4', NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-26 16:30:08');
+INSERT INTO `mstr_produk` VALUES (5, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
+INSERT INTO `mstr_produk` VALUES (6, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
+INSERT INTO `mstr_produk` VALUES (8, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for produk_kategori
+-- ----------------------------
+DROP TABLE IF EXISTS `produk_kategori`;
+CREATE TABLE `produk_kategori`  (
+  `Id_ProdukKategori` int(11) NOT NULL AUTO_INCREMENT,
+  `Id_Produk` int(11) NULL DEFAULT NULL,
+  `Id_Kategori` int(11) NULL DEFAULT NULL,
+  PRIMARY KEY (`Id_ProdukKategori`) USING BTREE,
+  INDEX `Id_Produk`(`Id_Produk`) USING BTREE,
+  INDEX `produk_kategori_ibfk_2`(`Id_Kategori`) USING BTREE,
+  CONSTRAINT `produk_kategori_ibfk_1` FOREIGN KEY (`Id_Produk`) REFERENCES `mstr_produk` (`Id_Produk`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `produk_kategori_ibfk_2` FOREIGN KEY (`Id_Kategori`) REFERENCES `mstr_kategori` (`Id_Kategori`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of produk_kategori
+-- ----------------------------
+INSERT INTO `produk_kategori` VALUES (9, 1, 2);
+INSERT INTO `produk_kategori` VALUES (10, 1, 5);
+INSERT INTO `produk_kategori` VALUES (12, 4, 4);
 
 -- ----------------------------
 -- Table structure for users
 -- ----------------------------
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`  (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp(0) NULL DEFAULT NULL,
@@ -101,10 +125,11 @@ CREATE TABLE `users`  (
   `updated_at` timestamp(0) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `users_email_unique`(`email`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
+INSERT INTO `users` VALUES (1, 'Tahta', 'shinoa696@gmail.com', NULL, '$2y$10$0sGozgNMLA4.HSW.KD69T.retpzfXgUYsCm6b/CQugeu0jIG8pJZ2', NULL, '2021-11-26 14:05:12', '2021-11-26 14:05:12');
 
 SET FOREIGN_KEY_CHECKS = 1;

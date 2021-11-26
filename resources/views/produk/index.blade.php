@@ -13,9 +13,16 @@
                     <div class="card-body">
                         <input type="search" id="search" class="k-textbox" style="width: 150px" placeholder="Nama produk"/>
                         <hr>
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                         <div class="form-group">
+                            <label for="nama" class="col-form-label">Limit Data:</label>
+                           <input type="number" id='limitPage' name='perpage' class='k-textbox' value='5'>
+                        </div>
+                        
+                        <button type="button" onclick='resetForm()'class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                             Tambah
                         </button>
+                        <br>
+                         
                         {{-- modal tambah --}}
                         <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg" role="document">
@@ -30,6 +37,8 @@
                                     {{-- Form modal --}}
                                     <form id="target" action="{{ route('produk.storeProduk') }}" method="POST">
                                         @csrf
+                                        <input type="hidden" id='IsEdit' value='0'>
+                                        <input type="hidden" id='url' value='0'>
                                         <div class="form-group">
                                           <label for="nama" class="col-form-label">Nama Produk:</label>
                                           <input type="text" class="form-control" id="nama" required>
@@ -59,53 +68,19 @@
                               </div>
                             </div>
                           </div>
-
-                          <div class="modal fade bd-example-modal-lg" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModal" aria-hidden="true">
-                            <div class="modal-dialog modal-lg" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="updateModal">Update Produk</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                    {{-- Form modal --}}
-                                    <form id="target" action="{{ route('produk.updateProduk') }}" method="POST">
-                                        @csrf
-                                        <div class="form-group">
-                                          <label for="nama" class="col-form-label">Nama Produk:</label>
-                                          <input type="text" class="form-control" id="updatenama" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="harga" class="col-form-label">Harga:</label>
-                                            <input type="number" class="form-control" id="harga" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="select_kategori" class="col-form-label">Kategori:</label>
-                                            <select class="js-example-responsive kategori" id="select_kategori" multiple="multiple" style="width: 75%"></select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="files" class="col-form-label">Foto:</label>
-                                            <input name="files" class="form-control-file"  id="files" type="file" aria-label="files" />
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="editor" class="col-form-label">Deskripsi:</label>
-                                          <textarea class="form-control" id="editor"></textarea>
-                                        </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                  <button type="submit" class="btn btn-primary" >Save changes</button>
-                                </div>
-                            </form>
-                              </div>
-                            </div>
-                          </div>
-
                          <hr>
 
-                        <div id="grid"></div>
+                        <div id="grid"></div>   
+                        <br>
+                           <center> 
+                           <div class="btn-group" role="group" aria-label="Third group">
+                                <button class='btn btn-secondary' onclick='prevPage()'>Sebelumnya</button>
+                                <button class='btn btn-info' id='halaman'></button>
+                                <button class='btn btn-secondary' onclick='nextPage()'>Selanjutnya</button>
+                            </div>
+                            </center>
+                                    {{-- <div className="text__page"><button class='btn btn-info' id='currentPage'></button>/<button class='btn btn-info'  id='totalPage'></button></div> --}}
+                      
                         <div id="ItemDelete"></div>
                         <script type="text/x-kendo-template" id="deleteDialogTemplateitem">
                         Anda yakin ingin menghapus <strong>#= Nama_Produk #</strong>?
@@ -119,8 +94,36 @@
   
   </section>
   <script type="text/javascript">
+    var currentPage;
+    var totalPage;
+    var perPage;
+    function resetForm(){
+        console.log(1)
+         $("#editor").data("kendoEditor").value('');
+           $('#IsEdit').val('0')
+            $('#target')[0].reset();
+           $("#select_kategori").val(0).trigger('change');
+    }
+    function nextPage(){
+        currentPage=parseInt(currentPage);
+        currentPage=parseInt((currentPage<totalPage?currentPage+1:currentPage));
+         console.log('next',currentPage)
+        $('#grid').data("kendoGrid").dataSource.read();
+    }
+    function prevPage(){
+          currentPage=parseInt(currentPage);
+        currentPage=parseInt((currentPage>1?currentPage-1:1));
+           console.log('prev',currentPage)
+        $('#grid').data("kendoGrid").dataSource.read();
+    }
+     $("#limitPage").keyup(function(){
+       val= $("#limitPage").val();
+       perPage=  ($("#limitPage").val()!=''?parseInt(val):0)
+       $('#grid').data('kendoGrid').refresh();
+          
+    });
     $(document).ready(function(){
-
+      
     
         $("#search").keyup(function() {
             var searchValue = $('#search').val();
@@ -132,24 +135,28 @@
                 }
             );
         });
-        
-        $('#select_kategori').select2({
-                width: 'resolve' ,
-                ajax: {
-                    url: '{{ route("kategori.getKategori") }}',
+            $.ajax({
+                    
+                    url:'{{ route("kategori.getKategori") }}',
                     dataType: 'json',
                     type: "GET",
-                    delay: 250,
-                    processResults: function (data) {
-                      var res = data.data.map(function (item) {
-                            return {id: item.Id_Kategori, text: item.Nama_Kategori};
+                    success:function(data){
+                        // the next thing you want to do 
+                    $('#select_kategori').select2({
+                        width: 'resolve' ,
+                    
+                    });
+                        
+                         data.data.map(function(res){
+                         
+                             var newOption = new Option(res.Nama_Kategori, res.Id_Kategori, false, false);
+                            $('#select_kategori').append(newOption).trigger('change'); 
                         });
-                    return {
-                        results: res
-                    };
                     }
-                }
             });
+
+        
+      
 
         deleteDialogTemplateitem = kendo.template($("#deleteDialogTemplateitem").html());
 
@@ -161,9 +168,17 @@
                            dataType:'json',
                            url:'{{route("produk.getProduk")}}',
                            type:'get',
-                           data: options.data,
+                           data:{
+                               currentPage:currentPage,
+                               perPage:perPage
+                           },
                            success: function (res) {
-                               options.success(res);
+
+                                options.success(res);
+                                currentPage=res.currentPage;
+                                perPage=res.perPage;
+                                totalPage=Math.ceil(res.total/res.perPage);
+                                $('#halaman').text(res.currentPage+'/'+ Math.ceil(res.total/res.perPage))
 
                            },
                            error: function (xhr, ajaxOptions, thrownError) {
@@ -198,15 +213,15 @@
                      }
                  }
                },
-               pageSize: 20
+              
            },
             
             noRecords: true,
             sortable: true,
-         
-            editable: {
-                mode: "popup",
+             pageable: {
+                refresh: true
             },
+         
            columns: [ {
                field: "Nama_Produk",
                title: "Nama Produk",
@@ -233,9 +248,8 @@
                title: "Deskirpsi Produk",
                width: 100,
                template:function(data_field) {
-              var res=  decodeEntities(data_field.Deskripsi_Produk)
-              console.log(res);
-                        return ''+res+'';
+                    var res=  decodeEntities(data_field.Deskripsi_Produk)
+                    return ''+res+'';
                 }
            },{
                headerTemplate: "<span class='k-icon k-i-gear'></span>",
@@ -248,12 +262,19 @@
                    style: "text-align: center"
                },
                command: [
-                 {
+                   {
+                       name: "ubah",
+                       iconClass: "k-icon k-i-close",
+                       text: "Edit",
+                       className: "btn btn-danger btn-sm",
+                       click: getClick
+                   },
+                    {
                        name: "hapus",
                        iconClass: "k-icon k-i-close",
                        text: "Hapus",
                        className: "btn btn-danger btn-sm",
-                       click: getClick
+                       click: deleteData
                    },
 
                ],
@@ -288,11 +309,20 @@
             e.preventDefault();
             var tr = $(e.target).closest("tr"),
             data = this.dataItem(tr);
-            // $('#target')[0].reset();
-            $('#exampleModal').modal('show'); 
-            $("#select_kategori").val(['4', '2']);
-            $('#select_kategori').trigger('change');
-            $('#select_kategori').trigger('change'); 
+            var id_select=[];
+            data.produk_kategoris.map(function(res){
+                id_select.push(res.Id_Kategori);
+            });
+            
+             $('#target')[0].reset();
+            $('#exampleModal').modal('show');
+
+            $("#harga").val(data.Harga_Produk);
+            $("#nama").val(data.Nama_Produk);
+            $("#IsEdit").val(data.Id_Produk);
+            $("#select_kategori").val(id_select).trigger('change');
+       
+            $("#editor").data("kendoEditor").value(decodeEntities(data.Deskripsi_Produk));
         }  
 
         function deleteData(e) { //start delete item
@@ -412,18 +442,31 @@
   
             $( "#target" ).submit(function( event ) {
                 event.preventDefault();
-                
-             
-            return false;
+                var tags= $("#select_kategori").val();
+                   tags.parents('.form-group').removeClass('is-invalid');
+      
+                if (tags.val() === '') {
+                    
+                    // Add is-invalid class when select2 element is required
+                    tags.parents('.form-group').addClass('is-invalid');
+                    
+                    // Stop submiting
+                    e.preventDefault();
+                    return false;
+                }
+          
                 var tags= $("#select_kategori").val();
                 formdata = new FormData();
                 formdata.append('nama', $('#nama').val());
                 formdata.append('harga', $('#harga').val());
+                formdata.append('id_produk', $('#IsEdit').val());
+                formdata.append('url', $('#IsEdit').val());
                 formdata.append('kategori', JSON.stringify(tags));
                 formdata.append('foto',$('#files')[0].files[0]);
                 formdata.append('deskirpsi', $('#editor').val());
-                console.log(formdata);
-                $.ajax({
+                console.log(tags);
+                if( $('#IsEdit').val()==='0'){
+                       $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                         },
@@ -433,6 +476,7 @@
                         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
                         processData: false,
                         success: function (e) {
+                            $('#exampleModal').modal('hide'); 
                             $('#target')[0].reset();
                             $('#grid').data("kendoGrid").dataSource.read();
                             swal('', e['message'], "info");
@@ -456,6 +500,46 @@
                         }
 
                     });
+                }else{
+                       $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                        },
+                        url: '{{route("produk.updateProduk")}}',
+                        data: formdata,
+                        type: 'POST',
+                        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                        processData: false,
+                        success: function (e) {
+                            $('#IsEdit').val('0')
+                            $('#exampleModal').modal('hide'); 
+                            $('#target')[0].reset();
+                            $('#grid').data("kendoGrid").dataSource.read();
+                            swal('', e['message'], "info");
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            $('#target')[0].reset();
+                            $('#IsEdit').val('0')
+                            swal({
+                                    title: thrownError,
+                                    text: 'Error!! ' + xhr.status,
+                                    type: "error",
+                                    confirmButtonColor: "#02991a",
+                                    confirmButtonText: "Refresh Serkarang",
+                                    cancelButtonText: "Tidak, Batalkan!",
+                                    closeOnConfirm: false,
+                                },
+                                function (isConfirm) {
+                                    if (isConfirm) {
+                                        window.location.reload(true) // submitting the form when user press yes
+                                    }
+                                });
+                        }
+
+                    });
+                }
+                  $('#IsEdit').val('0')
+                 $('#target')[0].reset();
             });
     })
 </script>

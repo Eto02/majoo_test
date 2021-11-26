@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Produk;
+use App\ProdukKategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
@@ -13,15 +15,18 @@ class ProdukController extends Controller
     }
     public function getProduk(Request $request)
     {
-
-        $prduk =  Produk::get();
-
+        $perPage=($request->exists('perPage')?$request->perPage:5);
+        $curentPage=($request->exists('currentPage')?$request->currentPage:1);
+        $prduk =  Produk::with('produkKategoris')->skip(($curentPage-1)*$perPage)->take($perPage)->get();
+// dd($prduk);
         if (count($prduk) <= 0) {
             $data['data'] = [];
             $data['total'] = 0;
         } elseif (count($prduk) > 0) {
             $data['data'] = $prduk;
-            $data['total'] = count($prduk);
+            $data['total'] = count(Produk::get());
+            $data['perPage']=$perPage;
+            $data['currentPage']=$curentPage;
         }
         return json_encode($data);
     }
@@ -46,6 +51,16 @@ class ProdukController extends Controller
 
                 $insert = Produk::insertGetId($data);
                 if ($insert) {
+                    if($request->kategori){
+                            // dd(json_decode( $request->kategori));
+                            foreach (json_decode( $request->kategori) as $key ) {
+                                ProdukKategori::insert([
+                                    'Id_Produk'=>$insert,
+                                    'Id_Kategori'=>$key
+                                ]);
+                        }
+                    }
+               
                     $image->move(storage_path('app/' . $main_path), $insert);
                     $insert = Produk::where('Id_Produk', $insert)
                         ->update([
@@ -65,8 +80,42 @@ class ProdukController extends Controller
     }
     public function updateProduk(Request $request)
     {
+        $main_path = 'public/upload/foto';
+
         try {
-            $update = Produk::where('Id_Produk', $request->Id_Produk)->update($request->all());
+            if ($request->hasFile('foto')) {
+                $image = $request->file('foto');
+                // $name =  $request->file('foto')->getClientOriginalName();
+                $data = [
+                    // 'Created_By' => Auth::user()->name,
+                    // 'Created_Date' => date('Y-m-d'),
+                    'Nama_Produk' => $request->nama,
+                    'Harga_Produk' => $request->harga,
+                    'Deskripsi_Produk' => $request->deskirpsi,
+                ];
+
+                $update = Produk::where('Id_Produk', $request->id_produk)->update($data);
+                if ($update) {
+                    if($request->kategori){
+                         $delete=  ProdukKategori::where('Id_Produk', $request->id_produk)->delete();
+                         
+                         foreach (json_decode( $request->kategori) as $key ) {
+                                ProdukKategori::insert([
+                                    'Id_Produk'=>$request->id_produk,
+                                    'Id_Kategori'=>$key
+                                ]);
+                        }
+                           
+                    }
+                    Storage::delete('public/upload/foto/'.$request->id_produk);
+                    $image->move(storage_path('app/' . $main_path), $request->id_produk);
+                    $update = Produk::where('Id_Produk', $request->id_produk)
+                        ->update([
+                            'Foto_Produk' => $main_path . "/" . $request->id_produk
+                        ]);
+                }
+            }
+           
 
             $data['message'] = 'Selamat anda berhasil merubah produk';
             $data['code'] = 1;
@@ -81,7 +130,10 @@ class ProdukController extends Controller
     {
         try {
 
+            Storage::delete('public/upload/foto/'.$request->id_produk);
+            ProdukKategori::where('Id_Produk', $request->Id_Produk)->delete();
             $delete = Produk::where('Id_Produk', $request->Id_Produk)->delete();
+          
 
             $data['message'] = 'Selamat anda berhasil menghapus produk';
             $data['code'] = 1;
