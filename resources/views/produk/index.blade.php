@@ -16,12 +16,12 @@
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                             Tambah
                         </button>
-
+                        {{-- modal tambah --}}
                         <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg" role="document">
                               <div class="modal-content">
                                 <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalLabel">Tambah Produk</h5>
+                                  <h5 class="modal-title" id="exampleModalLabel">Tambah / Update Produk</h5>
                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                   </button>
@@ -33,6 +33,49 @@
                                         <div class="form-group">
                                           <label for="nama" class="col-form-label">Nama Produk:</label>
                                           <input type="text" class="form-control" id="nama" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="harga" class="col-form-label">Harga:</label>
+                                            <input type="number" class="form-control" id="harga" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="select_kategori" class="col-form-label">Kategori:</label>
+                                            <select class="js-example-responsive kategori" id="select_kategori" multiple="multiple" style="width: 75%"></select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="files" class="col-form-label">Foto:</label>
+                                            <input name="files" class="form-control-file"  id="files" type="file" aria-label="files" />
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="editor" class="col-form-label">Deskripsi:</label>
+                                          <textarea class="form-control" id="editor"></textarea>
+                                        </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  <button type="submit" class="btn btn-primary" >Save changes</button>
+                                </div>
+                            </form>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="modal fade bd-example-modal-lg" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModal" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="updateModal">Update Produk</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                    {{-- Form modal --}}
+                                    <form id="target" action="{{ route('produk.updateProduk') }}" method="POST">
+                                        @csrf
+                                        <div class="form-group">
+                                          <label for="nama" class="col-form-label">Nama Produk:</label>
+                                          <input type="text" class="form-control" id="updatenama" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="harga" class="col-form-label">Harga:</label>
@@ -89,6 +132,24 @@
                 }
             );
         });
+        
+        $('#select_kategori').select2({
+                width: 'resolve' ,
+                ajax: {
+                    url: '{{ route("kategori.getKategori") }}',
+                    dataType: 'json',
+                    type: "GET",
+                    delay: 250,
+                    processResults: function (data) {
+                      var res = data.data.map(function (item) {
+                            return {id: item.Id_Kategori, text: item.Nama_Kategori};
+                        });
+                    return {
+                        results: res
+                    };
+                    }
+                }
+            });
 
         deleteDialogTemplateitem = kendo.template($("#deleteDialogTemplateitem").html());
 
@@ -187,9 +248,9 @@
                    style: "text-align: center"
                },
                command: [
-                   {
+                 {
                        name: "hapus",
-                    //    iconClass: "k-icon k-i-close",
+                       iconClass: "k-icon k-i-close",
                        text: "Hapus",
                        className: "btn btn-danger btn-sm",
                        click: getClick
@@ -227,13 +288,11 @@
             e.preventDefault();
             var tr = $(e.target).closest("tr"),
             data = this.dataItem(tr);
-            try {             //the name of your editor
-                varTitle= $('<textarea />').html(data.Deskripsi_Produk).text();
-                alert(document.write(varTitle));
-                //Do Your stuff here 
-
-            }
-            catch (e) { }
+            // $('#target')[0].reset();
+            $('#exampleModal').modal('show'); 
+            $("#select_kategori").val(['4', '2']);
+            $('#select_kategori').trigger('change');
+            $('#select_kategori').trigger('change'); 
         }  
 
         function deleteData(e) { //start delete item
@@ -350,28 +409,12 @@
                     "backColor",
                 ]
             });
-            $('.kategori').select2({
-                width: 'resolve' ,
-                ajax: {
-                    url: '{{ route("kategori.getKategori") }}',
-                    dataType: 'json',
-                    type: "GET",
-                    delay: 250,
-                    processResults: function (data) {
-                      console.log(data.data);
-                      var res = data.data.map(function (item) {
-                            return {id: item.Id_Kategori, text: item.Nama_Kategori};
-                        });
-                    return {
-                        results: res
-                    };
-                    }
-                }
-            });
+  
             $( "#target" ).submit(function( event ) {
                 event.preventDefault();
                 
-                
+             
+            return false;
                 var tags= $("#select_kategori").val();
                 formdata = new FormData();
                 formdata.append('nama', $('#nama').val());
@@ -390,10 +433,12 @@
                         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
                         processData: false,
                         success: function (e) {
+                            $('#target')[0].reset();
                             $('#grid').data("kendoGrid").dataSource.read();
                             swal('', e['message'], "info");
                         },
                         error: function (xhr, ajaxOptions, thrownError) {
+                            $('#target')[0].reset();
                             swal({
                                     title: thrownError,
                                     text: 'Error!! ' + xhr.status,
