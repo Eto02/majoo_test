@@ -35,7 +35,10 @@
                                   </button>
                                 </div>
                                 <div class="modal-body">
-                                    {{-- Form modal --}}
+                                   <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    
                                     <form id="target" action="{{ route('produk.storeProduk') }}" method="POST">
                                         @csrf
                                         <input type="hidden" id='IsEdit' value='0'>
@@ -331,6 +334,8 @@
             data.produk_kategoris.map(function(res){
                 id_select.push(res.Id_Kategori);
             });
+              $(".progress-bar").width('0%');
+                $(".progress-bar").html('');
               $('#IsEdit').val('0')
              $('#target')[0].reset();
               $("#editor").data("kendoEditor").value('');
@@ -501,6 +506,17 @@
                         }
                 
                        $.ajax({
+                            xhr: function() {
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener("progress", function(evt) {
+                                if (evt.lengthComputable) {
+                                    var percentComplete = ((evt.loaded / evt.total) * 100);
+                                    $(".progress-bar").width(percentComplete + '%');
+                                    $(".progress-bar").html(percentComplete+'%');
+                                }
+                            }, false);
+                            return xhr;
+                        },
                         headers: {
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                         },
@@ -509,10 +525,15 @@
                         type: 'POST',
                         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
                         processData: false,
+                         beforeSend: function(){
+                            $(".progress-bar").width('0%');
+                        },
                         success: function (e) {
-                            $('#exampleModal').modal('hide'); 
+                            $(".progress-bar").width('0%');
+                            $(".progress-bar").html('');
+                            $("#select_kategori").val(0).trigger('change');
                             $('#target')[0].reset();
-                             $("#editor").data("kendoEditor").value('');
+                            $("#editor").data("kendoEditor").value('');
                             $('#grid').data("kendoGrid").dataSource.read();
                             console.log( e)
                             swal('',  e.message, "info");
@@ -538,6 +559,17 @@
                     });
                 }else{
                        $.ajax({
+                            xhr: function() {
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener("progress", function(evt) {
+                                if (evt.lengthComputable) {
+                                    var percentComplete = ((evt.loaded / evt.total) * 100);
+                                    $(".progress-bar").width(percentComplete + '%');
+                                    $(".progress-bar").html(percentComplete+'%');
+                                }
+                            }, false);
+                            return xhr;
+                        },
                         headers: {
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                         },
@@ -546,8 +578,13 @@
                         type: 'POST',
                         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
                         processData: false,
+                          beforeSend: function(){
+                            $(".progress-bar").width('0%');
+                        },
                         success: function (e) {
-                             $("#editor").data("kendoEditor").value('');
+                            $(".progress-bar").width('0%');
+                            $(".progress-bar").html('');
+                            $("#editor").data("kendoEditor").value('');
                             $('#IsEdit').val('0')
                             $('#exampleModal').modal('hide'); 
                             $('#target')[0].reset();
@@ -575,10 +612,11 @@
 
                     });
                 }
-                 $("#editor").data("kendoEditor").value('');
-                  $('#IsEdit').val('0')
-                 $('#target')[0].reset();
-            });
+                $("#editor").data("kendoEditor").value('');
+                $('#IsEdit').val('0')
+                $('#target')[0].reset();
+              
+        });
     })
 </script>
 @endsection

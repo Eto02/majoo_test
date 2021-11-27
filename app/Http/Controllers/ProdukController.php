@@ -123,7 +123,8 @@ class ProdukController extends Controller
             ];
             $cekNama=Produk::where('Id_Produk', $request->id_produk)->first();
             $cekProduk=Produk::where('Nama_Produk',$request->nama)->count();
-            if ($cekNama->Nama_Prodak!=$request->nama && $cekProduk>0) {
+            if ($cekNama->Nama_Produk!=$request->nama && $cekProduk>0) {
+               
                 $data['message'] = 'Nama produk sudah ada';
                 $data['code'] = 1;
                 return response($data,200);
