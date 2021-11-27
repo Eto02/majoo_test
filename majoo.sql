@@ -11,7 +11,7 @@
  Target Server Version : 100419
  File Encoding         : 65001
 
- Date: 26/11/2021 23:54:39
+ Date: 27/11/2021 09:11:54
 */
 
 SET NAMES utf8mb4;
@@ -82,11 +82,11 @@ CREATE TABLE `mstr_produk`  (
 -- ----------------------------
 -- Records of mstr_produk
 -- ----------------------------
-INSERT INTO `mstr_produk` VALUES (1, NULL, 'Paket Adcance', 1000000, '&lt;strong&gt;Paket Advance&lt;/strong&gt;&lt;strong&gt;&lt;/strong&gt;', 'public/upload/foto/1', NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-26 16:29:11');
-INSERT INTO `mstr_produk` VALUES (4, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', 'public/upload/foto/4', NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-26 16:30:08');
-INSERT INTO `mstr_produk` VALUES (5, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
-INSERT INTO `mstr_produk` VALUES (6, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
-INSERT INTO `mstr_produk` VALUES (8, NULL, '12321', 123, '&lt;em&gt;asdas&lt;/em&gt;', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
+INSERT INTO `mstr_produk` VALUES (1, NULL, 'Paket Adcance', 1000000, '<strong><em>Paket Advance</em></strong>', 'public/upload/foto/1.png', NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-27 01:39:23');
+INSERT INTO `mstr_produk` VALUES (4, NULL, 'Paket Desktop', 8000000, '<strong><em><span style=\"font-family:\'Comic Sans MS\';\">asdas</span><span style=\"font-family:\'Andale Mono\';\"></span></em></strong><strong><em></em></strong>', 'public/upload/foto/4.png', NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-27 02:01:26');
+INSERT INTO `mstr_produk` VALUES (5, NULL, '12321', 123, 'asd', NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, '2021-11-27 01:35:05');
+INSERT INTO `mstr_produk` VALUES (6, NULL, '12321', 123, NULL, NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
+INSERT INTO `mstr_produk` VALUES (8, NULL, '12321', 123, NULL, NULL, NULL, '2021-11-26 00:00:00', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for produk_kategori
@@ -101,14 +101,14 @@ CREATE TABLE `produk_kategori`  (
   INDEX `produk_kategori_ibfk_2`(`Id_Kategori`) USING BTREE,
   CONSTRAINT `produk_kategori_ibfk_1` FOREIGN KEY (`Id_Produk`) REFERENCES `mstr_produk` (`Id_Produk`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `produk_kategori_ibfk_2` FOREIGN KEY (`Id_Kategori`) REFERENCES `mstr_kategori` (`Id_Kategori`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of produk_kategori
 -- ----------------------------
-INSERT INTO `produk_kategori` VALUES (9, 1, 2);
-INSERT INTO `produk_kategori` VALUES (10, 1, 5);
-INSERT INTO `produk_kategori` VALUES (12, 4, 4);
+INSERT INTO `produk_kategori` VALUES (22, 5, 5);
+INSERT INTO `produk_kategori` VALUES (27, 1, 4);
+INSERT INTO `produk_kategori` VALUES (37, 4, 5);
 
 -- ----------------------------
 -- Table structure for users

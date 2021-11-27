@@ -248,7 +248,7 @@
                title: "Deskirpsi Produk",
                width: 100,
                template:function(data_field) {
-                    var res=  decodeEntities(data_field.Deskripsi_Produk)
+                    var res=data_field.Deskripsi_Produk
                     return ''+res+'';
                 }
            },{
@@ -313,8 +313,9 @@
             data.produk_kategoris.map(function(res){
                 id_select.push(res.Id_Kategori);
             });
-            
+              $('#IsEdit').val('0')
              $('#target')[0].reset();
+              $("#editor").data("kendoEditor").value('');
             $('#exampleModal').modal('show');
 
             $("#harga").val(data.Harga_Produk);
@@ -322,7 +323,7 @@
             $("#IsEdit").val(data.Id_Produk);
             $("#select_kategori").val(id_select).trigger('change');
        
-            $("#editor").data("kendoEditor").value(decodeEntities(data.Deskripsi_Produk));
+            $("#editor").data("kendoEditor").value(data.Deskripsi_Produk);
         }  
 
         function deleteData(e) { //start delete item
@@ -384,9 +385,6 @@
         } //end delete funtion
         var editor = $(".editor").kendoEditor();
         var editor = $("#editor").kendoEditor({
-                stylesheets: [
-                    "../content/shared/styles/editor.css",
-                ],
                 tools: [
                     "bold",
                     "italic",
@@ -439,6 +437,18 @@
                     "backColor",
                 ]
             });
+            function removeTags(str) {
+                if ((str===null) || (str===''))
+                    return false;
+                else
+                    str = str.toString();
+                    
+                // Regular expression to identify HTML tags in 
+                // the input string. Replacing the identified 
+                // HTML tag with a null string.
+                return str.replace( /(<([^>]+)>)/ig, '');
+            }
+           
   
             $( "#target" ).submit(function( event ) {
                 event.preventDefault();
@@ -448,13 +458,18 @@
       
                 if (tag.val() ==null) {
                     
-                    // Add is-invalid class when select2 element is required
-                    tag.parent('.form-group').addClass('is-invalid');
-                    
-                    // Stop submiting
+                     swal('','Kategori harus dipilih', "warning");
                     return false;
                 }
-          
+                decode=      decodeEntities($('#editor').val());
+                removTag=removeTags(decode);
+                console.log();
+                if(  removTag==null||removTag==''){
+                    swal('','Deskripsi harus diisi', "warning");
+                    return false;
+                    
+                }
+               
                 var tags= $("#select_kategori").val();
                 formdata = new FormData();
                 formdata.append('nama', $('#nama').val());
@@ -463,9 +478,14 @@
                 formdata.append('url', $('#IsEdit').val());
                 formdata.append('kategori', JSON.stringify(tags));
                 formdata.append('foto',$('#files')[0].files[0]);
-                formdata.append('deskirpsi', $('#editor').val());
+                formdata.append('deskirpsi',  decodeEntities($('#editor').val()));
                 console.log(tags);
                 if( $('#IsEdit').val()==='0'){
+                      if($('#files')[0].files[0]===undefined){
+                            swal('','Foto harus diisi', "warning");
+                            return false;
+                        }
+                
                        $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
@@ -478,6 +498,7 @@
                         success: function (e) {
                             $('#exampleModal').modal('hide'); 
                             $('#target')[0].reset();
+                             $("#editor").data("kendoEditor").value('');
                             $('#grid').data("kendoGrid").dataSource.read();
                             swal('', e['message'], "info");
                         },
@@ -511,6 +532,7 @@
                         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
                         processData: false,
                         success: function (e) {
+                             $("#editor").data("kendoEditor").value('');
                             $('#IsEdit').val('0')
                             $('#exampleModal').modal('hide'); 
                             $('#target')[0].reset();
@@ -538,6 +560,7 @@
 
                     });
                 }
+                 $("#editor").data("kendoEditor").value('');
                   $('#IsEdit').val('0')
                  $('#target')[0].reset();
             });
