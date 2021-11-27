@@ -17,10 +17,11 @@
                             <label for="nama" class="col-form-label">Limit Data:</label>
                            <input type="number" id='limitPage' name='perpage' class='k-textbox' value='5'>
                         </div>
-                        
+                         <p style='color:red; text-decoration: underline;'><i>Note:Mohon melakukan refresh jika anda melakukan perubahan pada master kategori, dikarenakan select2 tidak mendukung preselect untuk ajax </i></p>
                         <button type="button" onclick='resetForm()'class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                             Tambah
                         </button>
+                        
                         <br>
                          
                         {{-- modal tambah --}}
@@ -97,6 +98,7 @@
     var currentPage;
     var totalPage;
     var perPage;
+    var search;
     function resetForm(){
         console.log(1)
          $("#editor").data("kendoEditor").value('');
@@ -119,6 +121,7 @@
      $("#limitPage").keyup(function(){
        val= $("#limitPage").val();
        perPage=  ($("#limitPage").val()!=''?parseInt(val):0)
+         $('#grid').data("kendoGrid").dataSource.read();
        $('#grid').data('kendoGrid').refresh();
           
     });
@@ -129,19 +132,15 @@
         template = template + "<li>" + ReportList[i].Id_Kategori + "</li>";
         }
        }
+       
+    $("#search").keyup(function() {
+         search = $('#search').val();
+           $('#grid').data("kendoGrid").dataSource.read();
+            $('#grid').data('kendoGrid').refresh();
+    });
     $(document).ready(function(){
       
     
-        $("#search").keyup(function() {
-            var searchValue = $('#search').val();
-            $("#grid").data("kendoGrid").dataSource.filter(
-                {
-                    field: "Nama_Produk",
-                    operator: "Contains",
-                    value: searchValue
-                }
-            );
-        });
             $.ajax({
                     
                     url:'{{ route("kategori.getKategori") }}',
@@ -176,6 +175,7 @@
                            url:'{{route("produk.getProduk")}}',
                            type:'get',
                            data:{
+                               search:search,
                                currentPage:currentPage,
                                perPage:perPage
                            },
@@ -224,11 +224,7 @@
            },
             
             noRecords: true,
-            sortable: true,
-             pageable: {
-                refresh: true
-            },
-         
+           
            columns: [ {
                field: "Nama_Produk",
                title: "Nama Produk",
@@ -374,6 +370,7 @@
                             },
                             dataType: "json",
                             success: function (e) {
+                                currentPage=1;
                                 $('#grid').data("kendoGrid").dataSource.read();
                                 swal('', e['message'], "info");
                             },
@@ -493,7 +490,6 @@
                 formdata.append('nama', $('#nama').val());
                 formdata.append('harga', $('#harga').val());
                 formdata.append('id_produk', $('#IsEdit').val());
-                formdata.append('url', $('#IsEdit').val());
                 formdata.append('kategori', JSON.stringify(tags));
                 formdata.append('foto',$('#files')[0].files[0]);
                 formdata.append('deskirpsi',  decodeEntities($('#editor').val()));
@@ -518,7 +514,8 @@
                             $('#target')[0].reset();
                              $("#editor").data("kendoEditor").value('');
                             $('#grid').data("kendoGrid").dataSource.read();
-                            swal('', e['message'], "info");
+                            console.log( e)
+                            swal('',  e.message, "info");
                         },
                         error: function (xhr, ajaxOptions, thrownError) {
                             $('#target')[0].reset();

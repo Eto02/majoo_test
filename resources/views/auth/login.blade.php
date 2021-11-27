@@ -58,13 +58,13 @@
              <form action="{{ route('auth.login') }}"  method='post'>
              @csrf
               <label for="uname"><b>Email</b></label>
-              <input type="text" class="" placeholder="Enter Username" name="email" autofocus required value{{old('email')}}>
+              <input type="text" class="" placeholder="Masukan email" name="email" autofocus required value{{old('email')}}>
               @error('email')
                 {{$message}}
               @enderror
               <br/>
               <label for="psw"><b>Password</b></label>
-              <input type="password" placeholder="Enter Password" name="password" required>
+              <input type="password" placeholder="Masukan password" name="password" required>
               <button type='submit' >
                  Login
               </button>

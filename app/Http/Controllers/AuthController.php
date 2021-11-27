@@ -41,7 +41,7 @@ class AuthController extends Controller
         ]);
 
         if ($user) {
-            return redirect()->back();
+            return redirect()->back()->with('alert', 'Berhasil mendafatar,silahkan login!');;
         }
         return back()->withErrors([
             'massage' => 'Gagal meperoses data',

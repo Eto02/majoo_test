@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdukController;
+use App\Produk;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,7 +32,17 @@ Route::group(['prefix' => 'auth', 'middleware' => ['guest']], function () {
     Route::post('register', [AuthController::class, 'register'])->name('auth.register');
 });
 
-Route::get('getProdukShow', [ProdukController::class, 'getProduk'])->name('produk.getProdukShow');
+Route::get('getProdukShow',  function () {
+    $prduk=Produk::get();
+    if (count($prduk) <= 0) {
+        $data['data'] = [];
+        $data['total'] = 0;
+    } elseif (count($prduk) > 0) {
+        $data['data'] = $prduk;
+        $data['total'] = count($prduk);
+    }
+    return json_encode($data);
+})->name('produk.getProdukShow');
 
 Route::group(['middleware' => ['auth']], function () {
 
