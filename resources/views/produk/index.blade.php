@@ -442,16 +442,16 @@
   
             $( "#target" ).submit(function( event ) {
                 event.preventDefault();
+                tag= $("#select_kategori");
                 var tags= $("#select_kategori").val();
-                   tags.parents('.form-group').removeClass('is-invalid');
+                   tag.parent('.form-group').removeClass('is-invalid');
       
-                if (tags.val() === '') {
+                if (tag.val() ==null) {
                     
                     // Add is-invalid class when select2 element is required
-                    tags.parents('.form-group').addClass('is-invalid');
+                    tag.parent('.form-group').addClass('is-invalid');
                     
                     // Stop submiting
-                    e.preventDefault();
                     return false;
                 }
           

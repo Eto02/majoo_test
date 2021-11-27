@@ -38,7 +38,7 @@ class ProdukController extends Controller
         try {
             if ($request->hasFile('foto')) {
                 $image = $request->file('foto');
-                // $name =  $request->file('foto')->getClientOriginalName();
+                $extension ='.'. $request->file('foto')->clientExtension();
                 $data = [
                     // 'Created_By' => Auth::user()->name,
                     'Created_Date' => date('Y-m-d'),
@@ -61,10 +61,10 @@ class ProdukController extends Controller
                         }
                     }
                
-                    $image->move(storage_path('app/' . $main_path), $insert);
+                    $image->move(storage_path('app/' . $main_path), $insert.$extension);
                     $insert = Produk::where('Id_Produk', $insert)
                         ->update([
-                            'Foto_Produk' => $main_path . "/" . $insert
+                            'Foto_Produk' => $main_path . "/" . $insert.$extension
                         ]);
                 }
             }
@@ -85,35 +85,39 @@ class ProdukController extends Controller
         try {
             if ($request->hasFile('foto')) {
                 $image = $request->file('foto');
-                // $name =  $request->file('foto')->getClientOriginalName();
-                $data = [
-                    // 'Created_By' => Auth::user()->name,
-                    // 'Created_Date' => date('Y-m-d'),
-                    'Nama_Produk' => $request->nama,
-                    'Harga_Produk' => $request->harga,
-                    'Deskripsi_Produk' => $request->deskirpsi,
-                ];
+                $extension ='.'. $request->file('foto')->clientExtension();
+               $name= $request->id_produk.$extension;
+              
 
-                $update = Produk::where('Id_Produk', $request->id_produk)->update($data);
-                if ($update) {
-                    if($request->kategori){
-                         $delete=  ProdukKategori::where('Id_Produk', $request->id_produk)->delete();
-                         
-                         foreach (json_decode( $request->kategori) as $key ) {
-                                ProdukKategori::insert([
-                                    'Id_Produk'=>$request->id_produk,
-                                    'Id_Kategori'=>$key
-                                ]);
-                        }
-                           
+          
+                Storage::delete('public/upload/foto/'.$name);
+                $image->move(storage_path('app/' . $main_path), $name);
+                $update = Produk::where('Id_Produk', $request->id_produk)
+                    ->update([
+                        'Foto_Produk' => $main_path . "/" .$name
+                    ]);
+            }
+            $data = [
+                // 'Created_By' => Auth::user()->name,
+                // 'Created_Date' => date('Y-m-d'),
+                'Nama_Produk' => $request->nama,
+                'Harga_Produk' => $request->harga,
+                'Deskripsi_Produk' => $request->deskirpsi,
+            ];
+            $update = Produk::where('Id_Produk', $request->id_produk)->update($data);
+            if ($update) {
+                if($request->kategori){
+                     $delete=  ProdukKategori::where('Id_Produk', $request->id_produk)->delete();
+                     
+                     foreach (json_decode( $request->kategori) as $key ) {
+                            ProdukKategori::insert([
+                                'Id_Produk'=>$request->id_produk,
+                                'Id_Kategori'=>$key
+                            ]);
                     }
-                    Storage::delete('public/upload/foto/'.$request->id_produk);
-                    $image->move(storage_path('app/' . $main_path), $request->id_produk);
-                    $update = Produk::where('Id_Produk', $request->id_produk)
-                        ->update([
-                            'Foto_Produk' => $main_path . "/" . $request->id_produk
-                        ]);
+                       
                 }
+               
             }
            
 
