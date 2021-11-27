@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $Modified_By
  * @property string $Modified_Date
  * @property string $updated_at
- * @property MstrProduk[] $mstrProduks
+ * @property ProdukKategori[] $produkKategoris
  */
 class Kategori extends Model
 {
@@ -39,8 +39,8 @@ class Kategori extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function mstrProduks()
+    public function produkKategoris()
     {
-        return $this->hasMany('App\MstrProduk', 'Id_Kategori', 'Id_Kategori');
+        return $this->hasMany('App\ProdukKategori', 'Id_Kategori', 'Id_Kategori');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Kategori;
+use App\ProdukKategori;
 use Illuminate\Http\Request;
 
 class KategoriController extends Controller
@@ -27,6 +28,10 @@ class KategoriController extends Controller
     }
     public function storeKategori(Request $request)
     {
+        $credentials = $request->validate([
+            'Nama_Kategori' => ['required'],
+            'Kode_Kategori' => ['required'],
+        ]);
         try {
             $insert = Kategori::insert($request->all());
 
@@ -55,8 +60,12 @@ class KategoriController extends Controller
     }
     public function deleteKategori(Request $request)
     {
-        try {
 
+        $credentials = $request->validate([
+            'Id_Kategori' => ['required'],
+        ]);
+        try {
+            ProdukKategori::where('Id_Kategori', $request->Id_Kategori)->delete();
             $delete = Kategori::where('Id_Kategori', $request->Id_Kategori)->delete();
 
             $data['message'] = 'Selamat anda berhasil menghapus kategori';

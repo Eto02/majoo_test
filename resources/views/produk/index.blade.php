@@ -122,6 +122,13 @@
        $('#grid').data('kendoGrid').refresh();
           
     });
+    function generateTemplate(ReportList) {
+        console.log(ReportList)
+        var template = "<ul>";
+        for (var i = 0; i < ReportList.length; i++) {
+        template = template + "<li>" + ReportList[i].Id_Kategori + "</li>";
+        }
+       }
     $(document).ready(function(){
       
     
@@ -231,6 +238,20 @@
                title: "Harga Produk",
                width: 100,
            },{
+               title: "Kategori",
+               width: 100,
+               template:function(data_field) {
+                // res=data_field.produk_kategoris;
+                var template = "<ul>";
+                for (var i = 0; i < data_field.produk_kategoris.length; i++) {
+                    console.log(data_field.produk_kategoris[i])
+                    if(data_field.produk_kategoris[i]!=null ){
+                        template = template + "<li>" +data_field.produk_kategoris[i].mstr_kategori.Nama_Kategori+ "</li>";
+                    }
+                }
+                return template;
+                },
+           },{
                field: "Foto_Produk",
                title: "Foto Produk",
                width: 100,
@@ -287,6 +308,7 @@
 
            }
        })//end grid
+   
        function decodeEntities(encodedString) {
             var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
             var translate = {
@@ -454,22 +476,18 @@
                 event.preventDefault();
                 tag= $("#select_kategori");
                 var tags= $("#select_kategori").val();
-                   tag.parent('.form-group').removeClass('is-invalid');
       
                 if (tag.val() ==null) {
-                    
-                     swal('','Kategori harus dipilih', "warning");
+                    swal('','Kategori harus dipilih', "warning");
                     return false;
                 }
-                decode=      decodeEntities($('#editor').val());
+                decode=decodeEntities($('#editor').val());
                 removTag=removeTags(decode);
-                console.log();
                 if(  removTag==null||removTag==''){
                     swal('','Deskripsi harus diisi', "warning");
                     return false;
                     
                 }
-               
                 var tags= $("#select_kategori").val();
                 formdata = new FormData();
                 formdata.append('nama', $('#nama').val());

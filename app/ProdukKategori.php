@@ -45,6 +45,6 @@ class ProdukKategori extends Model
      */
     public function mstrKategori()
     {
-        return $this->belongsTo('App\MstrKategori', 'Id_Kategori', 'Id_Kategori');
+        return $this->belongsTo('App\Kategori', 'Id_Kategori', 'Id_Kategori');
     }
 }
