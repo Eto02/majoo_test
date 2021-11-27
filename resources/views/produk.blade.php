@@ -19,7 +19,7 @@ $(document).ready(function(){
             success: function (res) {
 
               res.data.map(function(data){
-                  console.log(data)
+             
                 var foto=data.Foto_Produk;
                 url='';
                 deskripsi='white-space: normal'
@@ -32,7 +32,7 @@ $(document).ready(function(){
                     if(!imageExists(url)){
                         url='https://www.publicdomainpictures.net/pictures/280000/velka/not-found-image-15383864787lu.jpg'
                     }
-                    console.log(url);
+                 
                 html=   '<div class="">'+
                         '<div class="card flex " style="width: 18rem;margin:15px;height:500px" ;>'+
                         '<img class="card-img-top" src="'+url+'" alt="Card image cap">'+

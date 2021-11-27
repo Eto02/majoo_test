@@ -103,43 +103,39 @@
     var perPage;
     var search;
     function resetForm(){
-        console.log(1)
-         $("#editor").data("kendoEditor").value('');
-           $('#IsEdit').val('0')
-            $('#target')[0].reset();
-           $("#select_kategori").val(0).trigger('change');
+        $("#editor").data("kendoEditor").value('');
+        $('#IsEdit').val('0')
+        $('#target')[0].reset();
+        $("#select_kategori").val(0).trigger('change');
     }
     function nextPage(){
         currentPage=parseInt(currentPage);
         currentPage=parseInt((currentPage<totalPage?currentPage+1:currentPage));
-         console.log('next',currentPage)
         $('#grid').data("kendoGrid").dataSource.read();
     }
     function prevPage(){
-          currentPage=parseInt(currentPage);
+        currentPage=parseInt(currentPage);
         currentPage=parseInt((currentPage>1?currentPage-1:1));
-           console.log('prev',currentPage)
         $('#grid').data("kendoGrid").dataSource.read();
     }
      $("#limitPage").keyup(function(){
-       val= $("#limitPage").val();
-       perPage=  ($("#limitPage").val()!=''?parseInt(val):0)
-         $('#grid').data("kendoGrid").dataSource.read();
-       $('#grid').data('kendoGrid').refresh();
-          
+        val= $("#limitPage").val();
+        perPage=  ($("#limitPage").val()!=''?parseInt(val):0)
+        $('#grid').data("kendoGrid").dataSource.read();
+        $('#grid').data('kendoGrid').refresh();
+            
     });
     function generateTemplate(ReportList) {
-        console.log(ReportList)
         var template = "<ul>";
         for (var i = 0; i < ReportList.length; i++) {
         template = template + "<li>" + ReportList[i].Id_Kategori + "</li>";
         }
-       }
+    }
        
     $("#search").keyup(function() {
-         search = $('#search').val();
-           $('#grid').data("kendoGrid").dataSource.read();
-            $('#grid').data('kendoGrid').refresh();
+        search = $('#search').val();
+        $('#grid').data("kendoGrid").dataSource.read();
+        $('#grid').data('kendoGrid').refresh();
     });
     $(document).ready(function(){
       
@@ -151,14 +147,12 @@
                     type: "GET",
                     success:function(data){
                         // the next thing you want to do 
-                    $('#select_kategori').select2({
-                        width: 'resolve' ,
-                    
-                    });
-                        
-                         data.data.map(function(res){
-                         
-                             var newOption = new Option(res.Nama_Kategori, res.Id_Kategori, false, false);
+                        $('#select_kategori').select2({
+                            width: 'resolve' ,
+                        });
+                            
+                        data.data.map(function(res){
+                            var newOption = new Option(res.Nama_Kategori, res.Id_Kategori, false, false);
                             $('#select_kategori').append(newOption).trigger('change'); 
                         });
                     }
@@ -243,7 +237,7 @@
                 // res=data_field.produk_kategoris;
                 var template = "<ul>";
                 for (var i = 0; i < data_field.produk_kategoris.length; i++) {
-                    console.log(data_field.produk_kategoris[i])
+                
                     if(data_field.produk_kategoris[i]!=null ){
                         template = template + "<li>" +data_field.produk_kategoris[i].mstr_kategori.Nama_Kategori+ "</li>";
                     }
@@ -334,11 +328,11 @@
             data.produk_kategoris.map(function(res){
                 id_select.push(res.Id_Kategori);
             });
-              $(".progress-bar").width('0%');
-                $(".progress-bar").html('');
-              $('#IsEdit').val('0')
-             $('#target')[0].reset();
-              $("#editor").data("kendoEditor").value('');
+            $(".progress-bar").width('0%');
+            $(".progress-bar").html('');
+            $('#IsEdit').val('0')
+            $('#target')[0].reset();
+            $("#editor").data("kendoEditor").value('');
             $('#exampleModal').modal('show');
 
             $("#harga").val(data.Harga_Produk);
@@ -498,7 +492,7 @@
                 formdata.append('kategori', JSON.stringify(tags));
                 formdata.append('foto',$('#files')[0].files[0]);
                 formdata.append('deskirpsi',  decodeEntities($('#editor').val()));
-                console.log(tags);
+            
                 if( $('#IsEdit').val()==='0'){
                       if($('#files')[0].files[0]===undefined){
                             swal('','Foto harus diisi', "warning");
@@ -535,7 +529,7 @@
                             $('#target')[0].reset();
                             $("#editor").data("kendoEditor").value('');
                             $('#grid').data("kendoGrid").dataSource.read();
-                            console.log( e)
+                          
                             swal('',  e.message, "info");
                         },
                         error: function (xhr, ajaxOptions, thrownError) {
