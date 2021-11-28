@@ -57,7 +57,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="files" class="col-form-label">Foto:</label>
-                                            <input name="files" class="form-control-file"  id="files" type="file" aria-label="files" />
+                                            <input name="files" class="form-control-file"  id="files" type="file" aria-label="files" accept="image/png, image/gif, image/jpeg" />
                                         </div>
                                         <div class="form-group">
                                           <label for="editor" class="col-form-label">Deskripsi:</label>
