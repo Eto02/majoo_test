@@ -56,16 +56,21 @@
             <br>
            <form action="{{ route('auth.register') }}" method='post'>
            @csrf
-
-           @error('email')
-               {{$message}}
-           @enderror
+           @if (session('alert'))
+              <div class="alert alert-info">
+                  {{ session('alert') }}
+              </div>
+          @endif
+            @error('email')
+                {{$message}}
+            @enderror
+            <br>
             <label for="uname"><b>Nama</b></label>
-            <input type="text" placeholder="Enter Username" name="name" required>
+            <input type="text" placeholder="Masukan nama" name="name" required>
             <label for="uname"><b>Email</b></label>
-            <input type="text" placeholder="Enter Username" name="email" required>
+            <input type="text" placeholder="Masukan email" name="email" required>
             <label for="psw"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="password" required>
+            <input type="password" placeholder="Masukan password" name="password" required>
             <button type='submit' >
                Register
             </button>

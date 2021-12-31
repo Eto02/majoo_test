@@ -17,10 +17,11 @@
                             <label for="nama" class="col-form-label">Limit Data:</label>
                            <input type="number" id='limitPage' name='perpage' class='k-textbox' value='5'>
                         </div>
-                        
+                         <p style='color:red; text-decoration: underline;'><i>Note:Mohon melakukan refresh jika anda melakukan perubahan pada master kategori, dikarenakan select2 tidak mendukung preselect untuk ajax </i></p>
                         <button type="button" onclick='resetForm()'class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                             Tambah
                         </button>
+                        
                         <br>
                          
                         {{-- modal tambah --}}
@@ -34,7 +35,10 @@
                                   </button>
                                 </div>
                                 <div class="modal-body">
-                                    {{-- Form modal --}}
+                                   <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    
                                     <form id="target" action="{{ route('produk.storeProduk') }}" method="POST">
                                         @csrf
                                         <input type="hidden" id='IsEdit' value='0'>
@@ -53,7 +57,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="files" class="col-form-label">Foto:</label>
-                                            <input name="files" class="form-control-file"  id="files" type="file" aria-label="files" />
+                                            <input name="files" class="form-control-file"  id="files" type="file" aria-label="files" accept="image/png, image/gif, image/jpeg" />
                                         </div>
                                         <div class="form-group">
                                           <label for="editor" class="col-form-label">Deskripsi:</label>
@@ -97,51 +101,45 @@
     var currentPage;
     var totalPage;
     var perPage;
+    var search;
     function resetForm(){
-        console.log(1)
-         $("#editor").data("kendoEditor").value('');
-           $('#IsEdit').val('0')
-            $('#target')[0].reset();
-           $("#select_kategori").val(0).trigger('change');
+        $("#editor").data("kendoEditor").value('');
+        $('#IsEdit').val('0')
+        $('#target')[0].reset();
+        $("#select_kategori").val(0).trigger('change');
     }
     function nextPage(){
         currentPage=parseInt(currentPage);
         currentPage=parseInt((currentPage<totalPage?currentPage+1:currentPage));
-         console.log('next',currentPage)
         $('#grid').data("kendoGrid").dataSource.read();
     }
     function prevPage(){
-          currentPage=parseInt(currentPage);
+        currentPage=parseInt(currentPage);
         currentPage=parseInt((currentPage>1?currentPage-1:1));
-           console.log('prev',currentPage)
         $('#grid').data("kendoGrid").dataSource.read();
     }
      $("#limitPage").keyup(function(){
-       val= $("#limitPage").val();
-       perPage=  ($("#limitPage").val()!=''?parseInt(val):0)
-       $('#grid').data('kendoGrid').refresh();
-          
+        val= $("#limitPage").val();
+        perPage=  ($("#limitPage").val()!=''?parseInt(val):0)
+        $('#grid').data("kendoGrid").dataSource.read();
+        $('#grid').data('kendoGrid').refresh();
+            
     });
     function generateTemplate(ReportList) {
-        console.log(ReportList)
         var template = "<ul>";
         for (var i = 0; i < ReportList.length; i++) {
         template = template + "<li>" + ReportList[i].Id_Kategori + "</li>";
         }
-       }
+    }
+       
+    $("#search").keyup(function() {
+        search = $('#search').val();
+        $('#grid').data("kendoGrid").dataSource.read();
+        $('#grid').data('kendoGrid').refresh();
+    });
     $(document).ready(function(){
       
     
-        $("#search").keyup(function() {
-            var searchValue = $('#search').val();
-            $("#grid").data("kendoGrid").dataSource.filter(
-                {
-                    field: "Nama_Produk",
-                    operator: "Contains",
-                    value: searchValue
-                }
-            );
-        });
             $.ajax({
                     
                     url:'{{ route("kategori.getKategori") }}',
@@ -149,14 +147,12 @@
                     type: "GET",
                     success:function(data){
                         // the next thing you want to do 
-                    $('#select_kategori').select2({
-                        width: 'resolve' ,
-                    
-                    });
-                        
-                         data.data.map(function(res){
-                         
-                             var newOption = new Option(res.Nama_Kategori, res.Id_Kategori, false, false);
+                        $('#select_kategori').select2({
+                            width: 'resolve' ,
+                        });
+                            
+                        data.data.map(function(res){
+                            var newOption = new Option(res.Nama_Kategori, res.Id_Kategori, false, false);
                             $('#select_kategori').append(newOption).trigger('change'); 
                         });
                     }
@@ -176,6 +172,7 @@
                            url:'{{route("produk.getProduk")}}',
                            type:'get',
                            data:{
+                               search:search,
                                currentPage:currentPage,
                                perPage:perPage
                            },
@@ -224,11 +221,7 @@
            },
             
             noRecords: true,
-            sortable: true,
-             pageable: {
-                refresh: true
-            },
-         
+           
            columns: [ {
                field: "Nama_Produk",
                title: "Nama Produk",
@@ -244,7 +237,7 @@
                 // res=data_field.produk_kategoris;
                 var template = "<ul>";
                 for (var i = 0; i < data_field.produk_kategoris.length; i++) {
-                    console.log(data_field.produk_kategoris[i])
+                
                     if(data_field.produk_kategoris[i]!=null ){
                         template = template + "<li>" +data_field.produk_kategoris[i].mstr_kategori.Nama_Kategori+ "</li>";
                     }
@@ -335,9 +328,11 @@
             data.produk_kategoris.map(function(res){
                 id_select.push(res.Id_Kategori);
             });
-              $('#IsEdit').val('0')
-             $('#target')[0].reset();
-              $("#editor").data("kendoEditor").value('');
+            $(".progress-bar").width('0%');
+            $(".progress-bar").html('');
+            $('#IsEdit').val('0')
+            $('#target')[0].reset();
+            $("#editor").data("kendoEditor").value('');
             $('#exampleModal').modal('show');
 
             $("#harga").val(data.Harga_Produk);
@@ -374,6 +369,7 @@
                             },
                             dataType: "json",
                             success: function (e) {
+                                currentPage=1;
                                 $('#grid').data("kendoGrid").dataSource.read();
                                 swal('', e['message'], "info");
                             },
@@ -493,11 +489,10 @@
                 formdata.append('nama', $('#nama').val());
                 formdata.append('harga', $('#harga').val());
                 formdata.append('id_produk', $('#IsEdit').val());
-                formdata.append('url', $('#IsEdit').val());
                 formdata.append('kategori', JSON.stringify(tags));
                 formdata.append('foto',$('#files')[0].files[0]);
                 formdata.append('deskirpsi',  decodeEntities($('#editor').val()));
-                console.log(tags);
+            
                 if( $('#IsEdit').val()==='0'){
                       if($('#files')[0].files[0]===undefined){
                             swal('','Foto harus diisi', "warning");
@@ -505,6 +500,17 @@
                         }
                 
                        $.ajax({
+                            xhr: function() {
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener("progress", function(evt) {
+                                if (evt.lengthComputable) {
+                                    var percentComplete = ((evt.loaded / evt.total) * 100);
+                                    $(".progress-bar").width(percentComplete + '%');
+                                    $(".progress-bar").html(percentComplete+'%');
+                                }
+                            }, false);
+                            return xhr;
+                        },
                         headers: {
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                         },
@@ -513,12 +519,18 @@
                         type: 'POST',
                         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
                         processData: false,
+                         beforeSend: function(){
+                            $(".progress-bar").width('0%');
+                        },
                         success: function (e) {
-                            $('#exampleModal').modal('hide'); 
+                            $(".progress-bar").width('0%');
+                            $(".progress-bar").html('');
+                            $("#select_kategori").val(0).trigger('change');
                             $('#target')[0].reset();
-                             $("#editor").data("kendoEditor").value('');
+                            $("#editor").data("kendoEditor").value('');
                             $('#grid').data("kendoGrid").dataSource.read();
-                            swal('', e['message'], "info");
+                          
+                            swal('',  e.message, "info");
                         },
                         error: function (xhr, ajaxOptions, thrownError) {
                             $('#target')[0].reset();
@@ -541,6 +553,17 @@
                     });
                 }else{
                        $.ajax({
+                            xhr: function() {
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener("progress", function(evt) {
+                                if (evt.lengthComputable) {
+                                    var percentComplete = ((evt.loaded / evt.total) * 100);
+                                    $(".progress-bar").width(percentComplete + '%');
+                                    $(".progress-bar").html(percentComplete+'%');
+                                }
+                            }, false);
+                            return xhr;
+                        },
                         headers: {
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                         },
@@ -549,8 +572,13 @@
                         type: 'POST',
                         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
                         processData: false,
+                          beforeSend: function(){
+                            $(".progress-bar").width('0%');
+                        },
                         success: function (e) {
-                             $("#editor").data("kendoEditor").value('');
+                            $(".progress-bar").width('0%');
+                            $(".progress-bar").html('');
+                            $("#editor").data("kendoEditor").value('');
                             $('#IsEdit').val('0')
                             $('#exampleModal').modal('hide'); 
                             $('#target')[0].reset();
@@ -578,10 +606,11 @@
 
                     });
                 }
-                 $("#editor").data("kendoEditor").value('');
-                  $('#IsEdit').val('0')
-                 $('#target')[0].reset();
-            });
+                $("#editor").data("kendoEditor").value('');
+                $('#IsEdit').val('0')
+                $('#target')[0].reset();
+              
+        });
     })
 </script>
 @endsection

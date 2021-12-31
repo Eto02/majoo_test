@@ -105,5 +105,9 @@
             @yield('content')
         </main>
     </div>
+     <hr>
+    <footer class="footer p-3" style='text-align:center ;border'>
+        Copyright © 2018 - PT.{{env('APP_NAME')}}
+    </footer>
 </body>
 </html>

@@ -19,18 +19,23 @@ $(document).ready(function(){
             success: function (res) {
 
               res.data.map(function(data){
-                  console.log(data)
+             
                 var foto=data.Foto_Produk;
                 url='';
                 deskripsi='white-space: normal'
                 if(foto!=null){
                     deskripsi=data.Deskripsi_Produk.replace("white-space:pre", "white-space:normal")
-                    url=foto.replace("public", "storage");
+                    url='{{ url('') }}/'+foto.replace("public", "storage");
                 }
-                
+                    var img = $("<img src='{{ url('') }}"+url+"' />");
+
+                    if(!imageExists(url)){
+                        url='https://www.publicdomainpictures.net/pictures/280000/velka/not-found-image-15383864787lu.jpg'
+                    }
+                 
                 html=   '<div class="">'+
-                        '<div class="card flex h-100" style="width: 18rem;margin:15px;flex1" ;>'+
-                        '<img class="card-img-top" src="{{ url('') }}/'+url+'" alt="Card image cap">'+
+                        '<div class="card flex " style="width: 18rem;margin:15px;height:500px" ;>'+
+                        '<img class="card-img-top" src="'+url+'" alt="Card image cap">'+
                             '<div class="card-body  d-flex flex-column" style="word-wrap: break-word;">'+
                             '<h5 class="card-title "style="text-align:center">'+data.Nama_Produk+'</h5>'+
                             '<h5 class="card-title "style="text-align:center ">'+formatRupiah(data.Harga_Produk.toString(), 'Rp. ')+'</h5>'+
@@ -61,6 +66,16 @@ $(document).ready(function(){
             }
         })
 })
+function imageExists(image_url){
+
+    var http = new XMLHttpRequest();
+
+    http.open('HEAD', image_url, false);
+    http.send();
+
+    return http.status != 404;
+
+}
 function formatRupiah(angka, prefix){
 			var number_string = angka.replace(/[^,\d]/g, '').toString(),
 			split   		= number_string.split(','),
