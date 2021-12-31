@@ -41,7 +41,7 @@
                                         <input type="hidden" id='url' value='0'>
                                         <div class="form-group">
                                           <label for="nama" class="col-form-label">Nama Produk:</label>
-                                          <input type="text" class="form-control" id="nama" required>
+                                          <input type="text" class="form-control" id="nama" >
                                         </div>
                                         <div class="form-group">
                                             <label for="harga" class="col-form-label">Harga:</label>
